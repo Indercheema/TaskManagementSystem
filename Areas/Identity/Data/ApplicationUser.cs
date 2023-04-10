@@ -18,7 +18,7 @@ public class ApplicationUser : IdentityUser
     public string FullName { get; set; }
     public virtual HashSet<ProjectContributor> ProjectContributors { get; set; } = new HashSet<ProjectContributor>();
 
-    public virtual HashSet<Task> Tasks { get; set; } = new HashSet<Task>();
+    public virtual HashSet<TaskContributor> TaskContributors { get; set; } = new HashSet<TaskContributor>();
 
 }
 
