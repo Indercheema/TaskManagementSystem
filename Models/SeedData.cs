@@ -30,6 +30,7 @@ namespace TaskManagementSystem.Areas.Identity.Data
             {
                 ApplicationUser defaultAdministrator = new ApplicationUser
                 {
+                    FullName = "Admin",
                     Email = "admin34@gmail.com",
                     NormalizedEmail = "ADMIN34@GMAIL.COM",
                     UserName = "admin34@gmail.com",
