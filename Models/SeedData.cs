@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using TaskManagementSystem.Areas.Identity.Data;
 using TaskManagementSystem.Data;
 
-namespace TaskManagementSystem.Models
+namespace TaskManagementSystem.Areas.Identity.Data
 {
     public static class SeedData
     {
