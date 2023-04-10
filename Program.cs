@@ -11,6 +11,7 @@ builder.Services.AddDbContext<TaskContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<TaskContext>();
 
 // Add services to the container.
