@@ -12,9 +12,8 @@ namespace TaskManagementSystem.Areas.Identity.Data;
 // Add profile data for application users by adding properties to the ApplicationUser class
 public class ApplicationUser : IdentityUser
 {
-    [Required]
+    [Required(AllowEmptyStrings =false)]
     [Display(Name = "Full Name")]
-
     public string FullName { get; set; }
     public virtual HashSet<ProjectContributor> ProjectContributors { get; set; } = new HashSet<ProjectContributor>();
 
