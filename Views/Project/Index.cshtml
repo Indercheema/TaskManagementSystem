@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TaskManagementSystem.Models.Project>
+﻿@model TaskManagementSystem.Models.ViewModel.FilterByVM
 
 @{
     ViewData["Title"] = "Index";
@@ -10,17 +10,28 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<div>Select Order</div>
+<div>
+    <form asp-action="Index" method="post">
+        <select asp-for="Filter" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.FilterBy>()" class="form-control"></select>
+        <select asp-for="Order" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.OrderBy>()" class="form-control"></select>
+
+        <input type="submit" value="Change Order" />
+    </form>
+</div>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                @Html.DisplayNameFor(model => model.Project.Title)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (Project item in Model) {
+@foreach (Project item in Model.Projects) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
@@ -39,13 +50,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Tasks)
+                @Html.DisplayNameFor(model => model.Project.Tasks)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Projects)
         {
             <tr>
                 <td>
@@ -54,6 +65,7 @@
                     <td>
                         <ul>
                                 @Html.DisplayFor(modelItem => t.Title)
+                                @Html.DisplayFor(modelItem => t.RequiredHours)
                         </ul>
                     </td>
                     <td>

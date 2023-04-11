@@ -27,12 +27,56 @@ namespace TaskManagementSystem.Controllers
             _roleManager = roleManager;
 
         }
+        [HttpGet]
         public IActionResult Index()
         {
+            FilterByVM vm = new FilterByVM();
             HashSet<Project> projects = _context.Project
-                .Include(p => p.Tasks)
-                .ToHashSet();
-            return View(projects);
+               .Include(p => p.Tasks)
+               .OrderBy(p => p.Title)
+               .ToHashSet();
+
+            vm.Projects= projects;
+
+            return View(vm);
+
+        }
+
+
+        [HttpPost]
+        public IActionResult Index(FilterByVM vm)
+        {
+            if(vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Ascending))
+            {
+                vm.Projects = _context.Project.Include(p => p.Tasks.OrderBy(t => t.RequiredHours)).OrderBy(p => p.Title).ToHashSet();
+            }
+
+            if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Descending))
+            {
+                vm.Projects = _context.Project.Include(p => p.Tasks.OrderByDescending(t => t.RequiredHours)).OrderBy(p => p.Title).ToHashSet();
+            }
+
+            if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Ascending))
+            {
+                vm.Projects = _context.Project.Include(p => p.Tasks.OrderBy(t => t.Priority)).OrderBy(p => p.Title).ToHashSet();
+            }
+
+            if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Descending))
+            {
+                vm.Projects = _context.Project.Include(p => p.Tasks.OrderByDescending(t => t.Priority)).OrderBy(p => p.Title).ToHashSet();
+            }
+
+            if (vm.Filter.Equals(FilterBy.CompletedTask))
+            {
+                vm.Projects = _context.Project.Include(p => p.Tasks.Where(t => t.IsCompleted == false)).OrderBy(p => p.Title).ToHashSet();
+            }
+
+            if (vm.Filter.Equals(FilterBy.AssignedTask))
+            {
+                vm.Projects = _context.Project.Include(p => p.Tasks).ThenInclude(t => t.TaskContributors.Where(t => t.ApplicationUser.FullName == "User6")).ToHashSet();
+            }
+
+            return View(vm);
         }
 
         [HttpGet]
