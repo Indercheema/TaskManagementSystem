@@ -28,7 +28,12 @@ namespace TaskManagementSystem.Controllers
         public IActionResult Index()
         {
             ApplicationUser user = _context.Users.FirstOrDefault(u => u.UserName == User.Identity.Name);
-            HashSet<ProjectContributor> projects = _context.ProjectContributor.Include(pc => pc.Project).ThenInclude(p => p.Tasks).Where(pc => pc.UserId == user.Id).ToHashSet();
+
+            HashSet<ProjectContributor> projects = _context.ProjectContributor
+                .Include(pc => pc.Project)
+                .ThenInclude(p => p.Tasks)
+                .Where(pc => pc.UserId == user.Id)
+                .ToHashSet();
 
             return View(projects);
         }
@@ -60,13 +65,7 @@ namespace TaskManagementSystem.Controllers
             return RedirectToAction("Index");
 
         }
-        //[HttpGet]
-
-        //public IActionResult MarkAsCompleted(int? id)
-        //{
-        //    ViewBag.taskid = id;
-        //    return View();
-        //}
+        
 
         public IActionResult MarkAsCompleted(int? id, Task task)
         {

@@ -13,7 +13,7 @@ namespace TaskManagementSystem.Models.ViewModel
     {
         public List<SelectListItem> Roles { get; } = new List<SelectListItem>();
 
-        [Display(Name = "Select Role")]
+        [Display(Name = "Roles")]
         public string RoleId { get; set; }
 
         public string UserId { get; set; }

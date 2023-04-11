@@ -2,16 +2,19 @@
 
 @model TaskManagementSystem.Models.ViewModel.AssignRoleVM
 
-<h1>Create Project</h1>
+<h1>Assign Role</h1>
 
 <hr />
 
 <div class="row">
-    </div class="col-md-4">
+    <div class="col-md-4">
         <form asp-action="AssignRole" method="post">
             <div class="form-group mt-4">
                 <label asp-for="RoleId" class="control-label"></label>
-                <select asp-for="RoleId" asp-items="Model.Roles" class="mt-4"></select>
+                <br />
+                <select asp-for="RoleId" asp-items="Model.Roles" class="mt-2" style="border-radius: 5px; width:180px; height: 46px; padding: 5px">
+                   <option value="" hidden disabled selected>Select a Role</option>  
+                </select>
             </div>
             <div>
                 <input asp-for="UserId" value="@Model.UserId" type="hidden" />
@@ -23,10 +26,10 @@
     </div>
 </div>
 
-<div>
+<div class="mt-5">
     <a asp-action="Index">Back to Users List</a>
 </div>
 
 <div class="mt-5">
-    @Model.ViewMessage
+    <p style="color:red;font-size:16px">@Model.ViewMessage</p>
 </div>

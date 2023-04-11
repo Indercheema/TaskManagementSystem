@@ -54,6 +54,10 @@ namespace TaskManagementSystem.Controllers
 
             }
 
+            if(UsersNotInRole.Count == 0)
+            {
+                ViewBag.Message = "No Unassigned User";
+            }
             
             return View(UsersNotInRole);
         }
