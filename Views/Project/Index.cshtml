@@ -34,3 +34,36 @@
 }
     </tbody>
 </table>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Tasks)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @foreach (var t in item.Tasks)
+                    {
+                    <td>
+                        <ul>
+                                @Html.DisplayFor(modelItem => t.Title)
+                        </ul>
+                    </td>
+                    <td>
+                        <a asp-action="UpdateRequiredHours" asp-route-id="@t.Id">Adjust Required Hours</a> |
+                        <a asp-action="MarkAsCompleted" asp-route-id="@t.Id">Mark As Completed</a> |
+                    </td>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
