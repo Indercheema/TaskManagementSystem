@@ -24,7 +24,7 @@ namespace TaskManagementSystem.Models.ViewModel
 
 
         [Display(Name ="Completed")]
-        public bool IsCompleted { get; set; } = false;
+        public bool IsCompleted { get; set; } 
 
 
         [Display(Name = "Assignees")]
