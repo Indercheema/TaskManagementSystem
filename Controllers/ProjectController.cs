@@ -71,11 +71,6 @@ namespace TaskManagementSystem.Controllers
                 vm.Projects = _context.Project.Include(p => p.Tasks.Where(t => t.IsCompleted == false)).OrderBy(p => p.Title).ToHashSet();
             }
 
-            if (vm.Filter.Equals(FilterBy.AssignedTask))
-            {
-                vm.Projects = _context.Project.Include(p => p.Tasks).ThenInclude(t => t.TaskContributors.Where(t => t.ApplicationUser.FullName == "User6")).ToHashSet();
-            }
-
             return View(vm);
         }
 
