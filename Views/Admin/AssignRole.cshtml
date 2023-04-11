@@ -1,0 +1,18 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@model TaskManagementSystem.Models.ViewModel.AssignRoleVM
+
+
+<form asp-action="AssignRole" method="post">
+    <div>
+        <select asp-for="RoleId" asp-items="Model.Roles"></select>
+        <input asp-for="UserId" value="@Model.UserId" type="hidden" />
+
+    </div>
+    <input type="submit" value="Assign Role" />
+
+</form>
+
+
+<div>
+    @Model.ViewMessage
+</div>
