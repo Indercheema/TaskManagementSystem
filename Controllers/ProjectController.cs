@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Drawing.Drawing2D;
 using TaskManagementSystem.Areas.Identity.Data;
 using TaskManagementSystem.Data;
 using TaskManagementSystem.Models;
 using TaskManagementSystem.Models.ViewModel;
+using Project = TaskManagementSystem.Models.Project;
+using Task = TaskManagementSystem.Models.Task;
 
 namespace TaskManagementSystem.Controllers
 {
@@ -100,6 +103,49 @@ namespace TaskManagementSystem.Controllers
             catch (Exception ex)
             {
                 return NotFound();
+            }
+        }
+
+        public IActionResult CreateTask(int projectId)
+        {
+            Project selectedProject = _context.Project.Find(projectId);
+            
+            if (selectedProject != null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.ProjectId = selectedProject.Id;
+            return View();
+        }
+
+        public IActionResult CreateTask([Bind("Title","RequiredHours","IsComleted","Priority","ProjectId")]Task task)
+        {
+
+            try
+            {
+                Project selectedProject = _context.Project.Find(task.ProjectId);
+                Task newTask = new Task();
+
+                if (ModelState.IsValid)
+                {
+                    newTask.Id = task.Id;
+                    newTask.Title = task.Title;
+                    newTask.IsCompleted = false;
+                    newTask.RequiredHours = task.RequiredHours;
+                    newTask.Priority = task.Priority;
+                    newTask.Project= task.Project;
+
+                    selectedProject.Tasks.Add(newTask);
+                }
+
+                
+                _context.SaveChanges();
+                return RedirectToAction("Index");
+            } 
+            catch(Exception ex)
+            {
+                return BadRequest();
             }
         }
     }

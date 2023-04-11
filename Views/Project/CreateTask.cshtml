@@ -1,0 +1,53 @@
+﻿@model TaskManagementSystem.Models.ViewModel.CreateTaskVm
+
+@{
+    ViewData["Title"] = "CreateTask";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>CreateTask</h1>
+
+<h4>Task</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreateTask">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mt-4">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-4">
+                <label asp-for="RequiredHours" class="control-label"></label>
+                <input asp-for="RequiredHours" class="form-control" />
+                <span asp-validation-for="RequiredHours" class="text-danger"></span>
+            </div>
+            @*<div class="form-group form-check mt-4">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsCompleted" /> @Html.DisplayNameFor(model => model.IsCompleted)
+                </label>
+            </div>*@
+            <div class="form-group mt-4">
+                <label asp-for="Priority" class="control-label"></label>
+                <select asp-for="Priority" class="form-control"></select>
+                <span asp-validation-for="Priority" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <input type="hidden" value="@ViewBag.ProjectId"/>
+            </div>
+            <div class="form-group mt-4">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
