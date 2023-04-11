@@ -26,10 +26,36 @@ namespace TaskManagementSystem.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            List<ApplicationUser> users = _userManager.Users.Where(u => u.UserName != "admin34@gmail.com").ToList();
-            return View(users);
+            HashSet<ApplicationUser> UsersNotInRole = new HashSet<ApplicationUser>();
+
+            HashSet<string> allRoles = _context.Roles.Select(r => r.Name).ToHashSet();
+
+            HashSet<ApplicationUser> allUsers = _context.Users.ToHashSet();
+
+            foreach (ApplicationUser user in allUsers)
+            {
+                bool hasRole = false;
+
+                foreach (string role in allRoles)
+                {
+
+                    if(await _userManager.IsInRoleAsync(user, role))
+                    {
+                        hasRole= true;
+                    }
+                }
+
+                if (!hasRole)
+                {
+                    UsersNotInRole.Add(user);
+                }
+
+            }
+
+            
+            return View(UsersNotInRole);
         }
         [HttpGet]
         public async Task<IActionResult> AssignRole(string id)
