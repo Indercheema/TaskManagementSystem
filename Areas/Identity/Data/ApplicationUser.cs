@@ -15,6 +15,7 @@ public class ApplicationUser : IdentityUser
     [Required(AllowEmptyStrings =false)]
     [Display(Name = "Full Name")]
     public string FullName { get; set; }
+
     public virtual HashSet<ProjectContributor> ProjectContributors { get; set; } = new HashSet<ProjectContributor>();
 
     public virtual HashSet<TaskContributor> TaskContributors { get; set; } = new HashSet<TaskContributor>();
