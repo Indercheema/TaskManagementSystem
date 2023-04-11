@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using TaskManagementSystem.Areas.Identity.Data;
 using TaskManagementSystem.Data;
@@ -12,8 +13,7 @@ namespace TaskManagementSystem.Models.ViewModel
     {
         public List<SelectListItem> Roles { get; } = new List<SelectListItem>();
 
-        public List<IdentityRole> Roles2 { get; set; }
-
+        [Display(Name = "Select Role")]
         public string RoleId { get; set; }
 
         public string UserId { get; set; }
