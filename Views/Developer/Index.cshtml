@@ -5,74 +5,65 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Board</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Project.Title)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Project.Title)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="mt-4">
+    @foreach (ProjectContributor pc in Model)
+    {
+        <h5 class="mt-4">@pc.Project.Title</h5>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Project.Tasks)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+        if (pc.Project.Tasks.Count != 0)
         {
-            <tr>
-                <td>
-                    @foreach (var t in item.Project.Tasks)
+            <table class="table mt-4">
+                <thead>
+                    <tr>
+                        <th>
+                            Title
+                        </th>
+                        <th>
+                            Priority Level
+                        </th>
+                        <th>
+                            Required Hours
+                        </th>
+                        <th>
+                            Completed
+                        </th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in pc.Project.Tasks)
                     {
-                    <td>
-                        <ul>
+                        <tr>
+                            <td>
                                 @Html.DisplayFor(modelItem => t.Title)
-                        </ul>
-                    </td>
-                    <td>
-                            @Html.DisplayFor(modelItem => t.RequiredHours)
-
-                    </td>
-                    <td>
-                            @Html.DisplayFor(modelItem => t.IsCompleted)
-
-                    </td>
-                    <td>
-                        <a asp-action="UpdateRequiredHours" asp-route-id="@t.Id">Adjust Required Hours</a> |
-                        <a asp-action="MarkAsCompleted"  asp-route-id="@t.Id">Mark As Completed</a> |
-                    </td>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => t.Priority)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => t.RequiredHours)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => t.IsCompleted)
+                            </td>
+                            <td>
+                                <a style="background-color:darkblue;color: #fff; width: 450px; height:12%; border:none; border-radius:5px; padding:5px; text-decoration:none;" asp-action="UpdateRequiredHours" asp-route-id="@t.Id">Adjust Required Hours</a> 
+                                <a style="background-color:darkred;color: #fff; width: 450px; height:14%; border:none; border-radius:5px; padding:5px; text-decoration:none;" asp-action="MarkAsCompleted"  asp-route-id="@t.Id">Mark As Completed</a> 
+                            </td>
+                        </tr>
                     }
-                </td>
-            </tr>
+                </tbody>
+            </table>
+            <br />
+            <br />
         }
-    </tbody>
-</table>
+        else
+        {
+            <p>No Tasks Assigned</p>
+        }
+    }
+</div>
 
