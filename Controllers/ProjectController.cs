@@ -10,16 +10,18 @@ using TaskManagementSystem.Models.ViewModel;
 
 namespace TaskManagementSystem.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="Project Manager")]
     public class ProjectController : Controller
     {
         private readonly TaskContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public ProjectController(TaskContext context, UserManager<ApplicationUser> userManager)
+        public ProjectController(TaskContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _userManager = userManager;
+            _roleManager = roleManager;
 
         }
         public IActionResult Index()
@@ -33,9 +35,21 @@ namespace TaskManagementSystem.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            HashSet<ApplicationUser> users = _userManager.Users.Where(u => u.UserName != "admin34@gmail.com").ToHashSet();
+            HashSet<ApplicationUser> DevelopersInRole = new HashSet<ApplicationUser>();
 
-            CreateProjectVm vm = new CreateProjectVm(users);
+            IdentityRole role = _roleManager.Roles.Where(r => r.Name == "Developer").FirstOrDefault();
+
+            HashSet<string> DevelopersInRoleId = _context.UserRoles.Where(ur => ur.RoleId == role.Id)
+                .Select(ur => ur.UserId)
+                .ToHashSet();
+
+            foreach(string user in DevelopersInRoleId)
+            {
+                ApplicationUser developer = _context.Users.Find(user);
+                DevelopersInRole.Add(developer);
+            }
+
+            CreateProjectVm vm = new CreateProjectVm(DevelopersInRole);
 
             return View(vm);
         }
