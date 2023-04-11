@@ -26,7 +26,7 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Create Tasks</a> |
+                <a asp-action="CreateTask" asp-route-projectid="@item.Id">Create Task</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>

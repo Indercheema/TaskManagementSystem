@@ -106,41 +106,109 @@ namespace TaskManagementSystem.Controllers
             }
         }
 
-        public IActionResult CreateTask(int projectId)
+
+        /*
+        public IActionResult GetAllDevelopersInProject(int projectId)
         {
             Project selectedProject = _context.Project.Find(projectId);
-            
+
             if (selectedProject != null)
             {
                 return NotFound();
             }
 
+            HashSet<string> DevelopersInProjectId = _context.ProjectContributor.Where(pc => pc.ProjectId == selectedProject.Id).Select(pc => pc.UserId).ToHashSet();
+
+            HashSet<ApplicationUser> DevelopersInProject = new HashSet<ApplicationUser>();
+
+            foreach(string s in DevelopersInProjectId)
+            {
+                ApplicationUser developer = _context.Users.Find(s);
+
+                DevelopersInProject.Add(developer);
+            }
+
+            return View(DevelopersInProject);
+        }
+        */
+
+        [HttpGet]
+        public async Task<IActionResult> CreateTask(int projectid)
+        {
+            Project? selectedProject = _context.Project.Find(projectid);
+
+            if (selectedProject == null)
+            {
+                return NotFound();
+            }
+
             ViewBag.ProjectId = selectedProject.Id;
-            return View();
+
+            HashSet<string> DevelopersInProjectId = _context.ProjectContributor.Where(pc => pc.ProjectId == selectedProject.Id).Select(pc => pc.UserId).ToHashSet();
+
+            HashSet<ApplicationUser> DevelopersInProject = new HashSet<ApplicationUser>();
+
+            foreach (string s in DevelopersInProjectId)
+            {
+                ApplicationUser developer = _context.Users.Find(s);
+
+                DevelopersInProject.Add(developer);
+            }
+
+
+            CreateTaskVm vm = new CreateTaskVm(DevelopersInProject);
+
+            return View(vm);
         }
 
-        public IActionResult CreateTask([Bind("Title","RequiredHours","IsComleted","Priority","ProjectId")]Task task)
+        [HttpPost]
+        public IActionResult CreateTask([Bind("Title","RequiredHours","Priority","ProjectId")]CreateTaskVm vm)
         {
 
             try
             {
-                Project selectedProject = _context.Project.Find(task.ProjectId);
-                Task newTask = new Task();
+                
+                List<string> TaskDevelopersId = Request.Form["UserId"].ToList();
 
-                if (ModelState.IsValid)
+                List<ApplicationUser> Taskdevelopers = new List<ApplicationUser>();
+
+                foreach (string pd in TaskDevelopersId)
                 {
-                    newTask.Id = task.Id;
-                    newTask.Title = task.Title;
-                    newTask.IsCompleted = false;
-                    newTask.RequiredHours = task.RequiredHours;
-                    newTask.Priority = task.Priority;
-                    newTask.Project= task.Project;
+                    ApplicationUser user = _context.Users.Find(pd);
 
-                    selectedProject.Tasks.Add(newTask);
+                    if (user != null)
+                    {
+                        Taskdevelopers.Add(user);
+                    }
                 }
 
+                Task newTask = new Task();
+                newTask.Title = vm.Title;
+                newTask.IsCompleted = false;
+                newTask.RequiredHours = vm.RequiredHours;
+                newTask.Priority = vm.Priority;
+                newTask.Project= vm.Project;
+                newTask.ProjectId = vm.ProjectId;
+
+                _context.Add(newTask);
+                _context.SaveChanges();
+
+                foreach (ApplicationUser u in Taskdevelopers)
+                {
+                    TaskContributor newTaskContributor = new TaskContributor();
+
+                    newTaskContributor.Task = newTask;
+                    newTaskContributor.ApplicationUser = u;
+                    newTaskContributor.UserId = u.Id;
+                    newTaskContributor.TaskId = newTask.Id;
+
+                    u.TaskContributors.Add(newTaskContributor);
+                    newTask.TaskContributors.Add(newTaskContributor);
+                    _context.TaskContributor.Add(newTaskContributor);
+                }
                 
                 _context.SaveChanges();
+
                 return RedirectToAction("Index");
             } 
             catch(Exception ex)
