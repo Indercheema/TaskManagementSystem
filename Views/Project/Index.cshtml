@@ -106,65 +106,69 @@
     }
 </div>
 
-@if (Model.Tasks.Count > 0 && Model.Filter.Equals(FilterBy.AssignedTask))
-{
+@if (Model.Tasks.Count > 0 && Model.Filter.Equals(FilterBy.AssignedTask)) {
+<div class="mt-4">
+    @foreach (Project p in Model.Tasks.Select(p => p.Project).Distinct())
+    {
+        <div class="bg-light shadow-sm px-4 py-3 rounded-3 mt-5 code-button">
+            <h3 class="mt-4">@p.Title</h3>
+            <hr />
+            <br />
+            <a asp-action="CreateTask" asp-route-projectid="@p.Id">Create Task</a>
 
-    <div class="mt-4">
-        @foreach (Task t in Model.Tasks)
-        {
-            <div class="bg-light shadow-sm px-4 py-3 rounded-3 mt-5 code-button">
-                <h3 class="mt-4">@t.Project.Title</h3>
-                <hr />
+            @if (p.Tasks.Count != 0)
+            {
+                <table class="table mt-4">
+                    <thead>
+                        <tr>
+                            <th>
+                                Title
+                            </th>
+                            <th>
+                                Priority Level
+                            </th>
+                            <th>
+                                Required Hours
+                            </th>
+                            <th>
+                                Completed
+                            </th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var task in Model.Tasks.Where(t => t.ProjectId == p.Id))
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => task.Title)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => task.Priority)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => task.RequiredHours)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => task.IsCompleted)
+                                </td>
+                                <td>
+                                    <a asp-action="AssignTask" asp-route-taskId="@task.Id">Assign Task</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
                 <br />
-                <a asp-action="CreateTask" asp-route-projectid="@t.Project.Id">Create Task</a>
-                    <table class="table mt-4">
-                        <thead>
-                            <tr>
-                                <th>
-                                    Title
-                                </th>
-                                <th>
-                                    Priority Level
-                                </th>
-                                <th>
-                                    Required Hours
-                                </th>
-                                <th>
-                                    Completed
-                                </th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.Title)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.Priority)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.RequiredHours)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => t.IsCompleted)
-                                </td>
-                                <td>
-                                    <a asp-action="AssignTask" asp-route-taskId="@t.Id">Assign Task</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br />
-                    <br />             
-            </div>
+                <br />
+            }
+            else
+            {
+                <p style="color:red;font-size:16px; margin-top:15px;">No Task</p>
+            }
+        </div>
 
-        }
-    </div>
+    }
+</div>
 }
-else if (Model.Tasks.Count == 0 && Model.Filter.Equals(FilterBy.AssignedTask))
-{
-    <p style="color:red;font-size:16px; margin-top:15px;">No Task Found</p>
-}
-

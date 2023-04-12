@@ -110,7 +110,7 @@ namespace TaskManagementSystem.Controllers
 
 
                 }
-                vm.Tasks = tasks;
+                vm.Tasks = tasks.OrderBy(t => t.Project.Title).ToHashSet();
             }
 
             return View(vm);
