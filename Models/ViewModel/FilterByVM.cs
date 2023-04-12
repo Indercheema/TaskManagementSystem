@@ -5,8 +5,10 @@ namespace TaskManagementSystem.Models.ViewModel
 {
     public class FilterByVM
     {
+        [Display(Name ="Filter By")]
         public FilterBy Filter { get; set; } = FilterBy.Hours;
 
+        [Display(Name =("Order By"))]
         public OrderBy Order { get; set; } = OrderBy.Ascending;
 
         public Project Project { get; set; }

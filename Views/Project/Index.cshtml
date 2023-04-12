@@ -5,77 +5,102 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>Project Management Board</h1>
+<hr />
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Create Project</a>
 </p>
+<br />
 
-<div>Select Order</div>
+<h5>Sort Task</h5>
 <div>
     <form asp-action="Index" method="post">
-        <select asp-for="Filter" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.FilterBy>()" class="form-control"></select>
-        <select asp-for="Order" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.OrderBy>()" class="form-control"></select>
+        <div class="flex flex-row h-75 justify-content-between mt-3" style="display:flex; width:400px;">
+            <div class="w-[38] h-25">
+                <label asp-for="Filter" class="control-label"></label>
+                <br />
+                <select asp-for="Filter" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.FilterBy>()" style="border-radius: 5px; width:120px; height: 43px; padding: 5px;margin-top:4px"></select>
+            </div>
 
-        <input type="submit" value="Change Order" />
+            <div class="w-[38] h-25">
+                <label asp-for="Order" class="control-label"></label>
+                <br />
+                <select asp-for="Order" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.OrderBy>()" style="border-radius: 5px; width:120px; height: 43px; padding: 5px;margin-top:4px"></select>
+            </div>
+
+            <div>
+                <input type="submit" value="Apply" style="background-color:#000058;color: #fff;width:100px;height:44px;border:none;border-radius:5px; padding:5px;margin-top:26px;"/>
+            </div>
+        </div>
+        
+        
     </form>
 </div>
+<br />
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Project.Title)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (Project item in Model.Projects) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                <a asp-action="CreateTask" asp-route-projectid="@item.Id">Create Task</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="mt-4">
+    @foreach(Project p in Model.Projects)
+    {
+        <div class="bg-light shadow-sm px-4 py-3 rounded-3 mt-5 code-button">
+        <h3 class="mt-4">@p.Title</h3>
+        <hr />
+        <br />
+        <a asp-action="CreateTask" asp-route-projectid="@p.Id">Create Task</a>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Project.Tasks)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Projects)
+        @if(p.Tasks.Count != 0)
         {
-            <tr>
-                <td>
-                    @foreach (var t in item.Tasks)
+            <table class="table mt-4">
+                <thead>
+                    <tr>
+                        <th>
+                            Title
+                        </th>
+                        <th>
+                            Priority Level
+                        </th>
+                        <th>
+                            Required Hours
+                        </th>
+                        <th>
+                            Completed
+                        </th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var task in p.Tasks)
                     {
-                    <td>
-                        <ul>
-                                @Html.DisplayFor(modelItem => t.Title)
-                                @Html.DisplayFor(modelItem => t.RequiredHours)
-                        </ul>
-                    </td>
-                    <td>
-                        <a asp-action="UpdateRequiredHours" asp-route-id="@t.Id">Adjust Required Hours</a> |
-                        <a asp-action="MarkAsCompleted" asp-route-id="@t.Id">Mark As Completed</a> |
-                    </td>
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => task.Title)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => task.Priority)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => task.RequiredHours)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => task.IsCompleted)
+                            </td>
+                            <td>
+                                <a asp-action="AssignTask" asp-route-taskId="@task.Id">Assign Task</a> 
+                            </td>
+                        </tr>
                     }
-                </td>
-            </tr>
+                </tbody>
+            </table>
+            <br />
+            <br />
         }
-    </tbody>
-</table>
+        else
+        {
+           <p style="color:red;font-size:16px; margin-top:15px;">No Assigned Tasks</p>
+        }
+        </div>
+
+    }
+</div>
 

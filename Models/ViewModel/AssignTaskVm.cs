@@ -5,26 +5,12 @@ using TaskManagementSystem.Areas.Identity.Data;
 
 namespace TaskManagementSystem.Models.ViewModel
 {
-    public class CreateTaskVm
+    public class AssignTaskVm
     {
         public List<SelectListItem> Developers { get; } = new List<SelectListItem>();
 
-
-        [Display(Name = "Title")]
-        public string Title { get; set; }
-
-        [Display(Name = "Required Hours")]
-        public int RequiredHours { get; set; }
-
-        [Display(Name ="Priority Level")]
-        public Priority Priority { get; set; }
-
-        public Project? Project { get; set; }
-        public int ProjectId { get; set; }
-
-
-        [Display(Name ="Completed")]
-        public bool IsCompleted { get; set; } 
+        public Task? Task { get; set; }
+        public int TaskId { get; set; }
 
 
         [Display(Name = "Assignees")]
@@ -33,7 +19,7 @@ namespace TaskManagementSystem.Models.ViewModel
         public ApplicationUser? ApplicationUser { get; set; }
 
 
-        public CreateTaskVm(HashSet<ApplicationUser> developer)
+        public AssignTaskVm(HashSet<ApplicationUser> developer)
         {
             foreach (ApplicationUser u in developer)
             {
@@ -41,6 +27,6 @@ namespace TaskManagementSystem.Models.ViewModel
             }
         }
 
-        public CreateTaskVm() { }
+        public AssignTaskVm() { }
     }
 }
