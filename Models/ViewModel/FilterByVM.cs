@@ -13,6 +13,8 @@ namespace TaskManagementSystem.Models.ViewModel
 
         public Project Project { get; set; }
 
+        public int ProjectId { get; set; }
+
         public Task Task { get; set; }
 
         public HashSet<Task> Tasks { get; set; } = new HashSet<Task>();

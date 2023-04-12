@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 using System.Drawing.Drawing2D;
 using TaskManagementSystem.Areas.Identity.Data;
 using TaskManagementSystem.Data;
@@ -13,7 +15,7 @@ using Task = TaskManagementSystem.Models.Task;
 
 namespace TaskManagementSystem.Controllers
 {
-    [Authorize(Roles ="Project Manager")]
+    [Authorize(Roles = "Project Manager")]
     public class ProjectController : Controller
     {
         private readonly TaskContext _context;
@@ -36,7 +38,7 @@ namespace TaskManagementSystem.Controllers
                .OrderBy(p => p.Title)
                .ToHashSet();
 
-            vm.Projects= projects;
+            vm.Projects = projects;
 
             return View(vm);
 
@@ -46,7 +48,7 @@ namespace TaskManagementSystem.Controllers
         [HttpPost]
         public IActionResult Index(FilterByVM vm)
         {
-            if(vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Ascending))
+            if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Ascending))
             {
                 vm.Projects = _context.Project.Include(p => p.Tasks.OrderBy(t => t.RequiredHours)).OrderBy(p => p.Title).ToHashSet();
             }
@@ -117,6 +119,92 @@ namespace TaskManagementSystem.Controllers
         }
 
         [HttpGet]
+
+        public IActionResult Details(int projectid)
+        {
+            FilterByVM vm = new FilterByVM();
+            Project project = _context.Project.Include(p => p.Tasks).FirstOrDefault(p => p.Id == projectid);
+            vm.ProjectId = projectid;
+            vm.Project = project;
+            return View(vm);
+        }
+
+        [HttpPost]
+
+        public IActionResult Details(FilterByVM vm)
+        {
+
+            if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Ascending))
+            {
+                vm.Project = _context.Project.Include(p => p.Tasks.OrderBy(t => t.RequiredHours)).First(p => p.Id == vm.ProjectId);
+            }
+
+            if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Descending))
+            {
+                vm.Project = _context.Project.Include(p => p.Tasks.OrderByDescending(t => t.RequiredHours)).First(p => p.Id == vm.ProjectId);
+            }
+
+            if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Ascending))
+            {
+                vm.Project = _context.Project.Include(p => p.Tasks.OrderBy(t => t.Priority)).First(p => p.Id == vm.ProjectId);
+            }
+
+            if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Descending))
+            {
+                vm.Project = _context.Project.Include(p => p.Tasks.OrderByDescending(t => t.Priority)).First(p => p.Id == vm.ProjectId);
+            }
+
+            if (vm.Filter.Equals(FilterBy.CompletedTask))
+            {
+                vm.Project = _context.Project.Include(p => p.Tasks.Where(t => t.IsCompleted == false)).First(p => p.Id == vm.ProjectId);
+            }
+
+            if (vm.Filter.Equals(FilterBy.AssignedTask))
+            {
+
+                vm.Project = _context.Project.First(p => p.Id == vm.ProjectId);
+
+                HashSet<Task> tasks = new HashSet<Task>();
+
+                HashSet<Project> projects = _context.Project.ToHashSet();
+
+                HashSet<Project> project2 = new HashSet<Project>();
+
+                HashSet<Task> allTasks = _context.Task.ToHashSet();
+
+                HashSet<TaskContributor> taskContributors = _context.TaskContributor.ToHashSet();
+
+                //foreach (Project p in projects)
+                //{
+                    foreach (Task t in vm.Project.Tasks)
+                    {
+                        bool hasUnAssignedTask = false;
+
+                        foreach (TaskContributor tc in taskContributors)
+                        {
+
+                            if (t.Id == tc.TaskId)
+                            {
+                                hasUnAssignedTask = true;
+                            }
+
+                        }
+                        if (!hasUnAssignedTask)
+                        {
+                            tasks.Add(t);
+
+                        }
+
+                    }
+
+
+                //}
+                vm.Tasks = tasks;
+            }
+
+            return View(vm);
+        }
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
             IdentityRole role = _roleManager.Roles.Where(r => r.Name == "Developer").FirstOrDefault();
@@ -139,8 +227,8 @@ namespace TaskManagementSystem.Controllers
             return View(vm);
         }
 
-        [HttpPost] 
-        public IActionResult Create([Bind("Title","UserId")]CreateProjectVm vm)
+        [HttpPost]
+        public IActionResult Create([Bind("Title", "UserId")] CreateProjectVm vm)
         {
             try
             {
@@ -205,7 +293,7 @@ namespace TaskManagementSystem.Controllers
 
             return AssignedProjectDevelopers;
         }
-        
+
 
         [HttpGet]
 
@@ -225,7 +313,7 @@ namespace TaskManagementSystem.Controllers
 
         [HttpPost]
 
-        public IActionResult CreateTask([Bind("Title","RequiredHours","Priority","ProjectId")]Task task)
+        public IActionResult CreateTask([Bind("Title", "RequiredHours", "Priority", "ProjectId")] Task task)
         {
             try
             {
@@ -237,7 +325,7 @@ namespace TaskManagementSystem.Controllers
                 newTask.Project = task.Project;
                 newTask.ProjectId = task.ProjectId;
 
-                
+
                 if (TryValidateModel(newTask))
                 {
                     _context.Add(newTask);
@@ -251,7 +339,7 @@ namespace TaskManagementSystem.Controllers
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest();
             }
@@ -333,10 +421,10 @@ namespace TaskManagementSystem.Controllers
                 {
                     return BadRequest();
                 }
-                
-                
-            } 
-            catch(Exception ex)
+
+
+            }
+            catch (Exception ex)
             {
                 return BadRequest();
             }
