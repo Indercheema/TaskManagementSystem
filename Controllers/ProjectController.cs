@@ -117,17 +117,18 @@ namespace TaskManagementSystem.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            HashSet<ApplicationUser> DevelopersInRole = new HashSet<ApplicationUser>();
-
             IdentityRole role = _roleManager.Roles.Where(r => r.Name == "Developer").FirstOrDefault();
+
 
             HashSet<string> DevelopersInRoleId = _context.UserRoles.Where(ur => ur.RoleId == role.Id)
                 .Select(ur => ur.UserId)
                 .ToHashSet();
 
-            foreach(string user in DevelopersInRoleId)
+            HashSet<ApplicationUser> DevelopersInRole = new HashSet<ApplicationUser>();
+
+            foreach (string user in DevelopersInRoleId)
             {
                 ApplicationUser developer = _context.Users.Find(user);
                 DevelopersInRole.Add(developer);
@@ -188,30 +189,23 @@ namespace TaskManagementSystem.Controllers
         }
 
 
-        /*
-        public IActionResult GetAllDevelopersInProject(int projectId)
+        public HashSet<ApplicationUser> GetAllDevelopersInProject(Task task)
         {
-            Project selectedProject = _context.Project.Find(projectId);
 
-            if (selectedProject != null)
-            {
-                return NotFound();
-            }
+            HashSet<string> AssignedProjectDevelopersId = _context.ProjectContributor.Where(pc => pc.ProjectId == task.ProjectId).Select(pc => pc.UserId).ToHashSet();
 
-            HashSet<string> DevelopersInProjectId = _context.ProjectContributor.Where(pc => pc.ProjectId == selectedProject.Id).Select(pc => pc.UserId).ToHashSet();
+            HashSet<ApplicationUser> AssignedProjectDevelopers = new HashSet<ApplicationUser>();
 
-            HashSet<ApplicationUser> DevelopersInProject = new HashSet<ApplicationUser>();
-
-            foreach(string s in DevelopersInProjectId)
+            foreach (string s in AssignedProjectDevelopersId)
             {
                 ApplicationUser developer = _context.Users.Find(s);
 
-                DevelopersInProject.Add(developer);
+                AssignedProjectDevelopers.Add(developer);
             }
 
-            return View(DevelopersInProject);
+            return AssignedProjectDevelopers;
         }
-        */
+        
 
         [HttpGet]
 
@@ -276,21 +270,7 @@ namespace TaskManagementSystem.Controllers
 
             ViewBag.TaskId = selectedTask.Id;
 
-
-
-            HashSet<string> DevelopersInProjectId = _context.ProjectContributor.Where(pc => pc.ProjectId == selectedTask.ProjectId).Select(pc => pc.UserId).ToHashSet();
-
-            HashSet<ApplicationUser> DevelopersInProject = new HashSet<ApplicationUser>();
-
-            foreach (string s in DevelopersInProjectId)
-            {
-                ApplicationUser developer = _context.Users.Find(s);
-
-                DevelopersInProject.Add(developer);
-            }
-
-
-            AssignTaskVm vm = new AssignTaskVm(DevelopersInProject);
+            AssignTaskVm vm = new AssignTaskVm(GetAllDevelopersInProject(selectedTask));
 
             return View(vm);
         }
@@ -301,37 +281,48 @@ namespace TaskManagementSystem.Controllers
 
             try
             {
-                Task selectedTask = _context.Task.Find(vm.TaskId);
+                Task? selectedTask = _context.Task.Find(vm.TaskId);
 
                 if (selectedTask != null)
                 {
 
-                    List<string> TaskDevelopersId = Request.Form["UserId"].ToList();
+                    List<string> AssignedTaskDevelopersId = Request.Form["UserId"].ToList();
 
-                    List<ApplicationUser> Taskdevelopers = new List<ApplicationUser>();
+                    List<ApplicationUser> AssignedTaskDevelopers = new List<ApplicationUser>();
 
-                    foreach (string pd in TaskDevelopersId)
+                    foreach (string developer in AssignedTaskDevelopersId)
                     {
-                        ApplicationUser user = _context.Users.Find(pd);
+                        ApplicationUser? user = _context.Users.Find(developer);
 
                         if (user != null)
                         {
-                            Taskdevelopers.Add(user);
+                            AssignedTaskDevelopers.Add(user);
                         }
                     }
 
-                    foreach (ApplicationUser u in Taskdevelopers)
+                    foreach (ApplicationUser u in AssignedTaskDevelopers)
                     {
-                        TaskContributor newTaskContributor = new TaskContributor();
+                        if (_context.TaskContributor.Any(tc => tc.UserId == u.Id && tc.TaskId == selectedTask.Id))
+                        {
+                            ViewBag.Message = $"{u.FullName} already assigned to this task";
 
-                        newTaskContributor.Task = selectedTask;
-                        newTaskContributor.ApplicationUser = u;
-                        newTaskContributor.UserId = u.Id;
-                        newTaskContributor.TaskId = selectedTask.Id;
+                            ViewBag.TaskId = selectedTask.Id;
+                            AssignTaskVm newVm = new AssignTaskVm(GetAllDevelopersInProject(selectedTask));
+                            return View(newVm);
+                        }
+                        else
+                        {
+                            TaskContributor newTaskContributor = new TaskContributor();
 
-                        u.TaskContributors.Add(newTaskContributor);
-                        selectedTask.TaskContributors.Add(newTaskContributor);
-                        _context.TaskContributor.Add(newTaskContributor);
+                            newTaskContributor.Task = selectedTask;
+                            newTaskContributor.ApplicationUser = u;
+                            newTaskContributor.UserId = u.Id;
+                            newTaskContributor.TaskId = selectedTask.Id;
+
+                            u.TaskContributors.Add(newTaskContributor);
+                            selectedTask.TaskContributors.Add(newTaskContributor);
+                            _context.TaskContributor.Add(newTaskContributor);
+                        }
                     }
 
                     _context.SaveChanges();

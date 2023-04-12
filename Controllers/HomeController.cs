@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using TaskManagementSystem.Data;
 using TaskManagementSystem.Models;
 
 namespace TaskManagementSystem.Controllers
