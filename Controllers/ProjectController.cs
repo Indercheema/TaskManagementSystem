@@ -71,6 +71,48 @@ namespace TaskManagementSystem.Controllers
                 vm.Projects = _context.Project.Include(p => p.Tasks.Where(t => t.IsCompleted == false)).OrderBy(p => p.Title).ToHashSet();
             }
 
+            if (vm.Filter.Equals(FilterBy.AssignedTask))
+            {
+
+                HashSet<Task> tasks = new HashSet<Task>();
+
+                HashSet<Project> projects = _context.Project.ToHashSet();
+
+                HashSet<Project> project2 = new HashSet<Project>();
+
+                HashSet<Task> allTasks = _context.Task.ToHashSet();
+
+                HashSet<TaskContributor> taskContributors = _context.TaskContributor.ToHashSet();
+
+                foreach (Project p in projects)
+                {
+                    foreach (Task t in p.Tasks)
+                    {
+                        bool hasRole = false;
+
+                        foreach (TaskContributor tc in taskContributors)
+                        {
+
+                            if (t.Id == tc.TaskId)
+                            {
+                                hasRole = true;
+                            }
+
+                        }
+                        if (!hasRole)
+                        {
+                            tasks.Add(t);
+                            project2.Add(p);
+
+                        }
+
+                    }
+
+
+                }
+                vm.Tasks = tasks;
+            }
+
             return View(vm);
         }
 
