@@ -31,7 +31,8 @@ namespace TaskManagementSystem.Controllers
 
             HashSet<ProjectContributor> projects = _context.ProjectContributor
                 .Include(pc => pc.Project)
-                .ThenInclude(p => p.Tasks)
+                .ThenInclude(p => p.Tasks.Where(t => t.TaskContributors.Any(tc => tc.UserId == user.Id)))
+                .ThenInclude(t => t.TaskContributors)
                 .Where(pc => pc.UserId == user.Id)
                 .ToHashSet();
 

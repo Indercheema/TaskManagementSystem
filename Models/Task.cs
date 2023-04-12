@@ -13,7 +13,7 @@ namespace TaskManagementSystem.Models
         public string Title { get; set; }
 
         [Display(Name = "Required Hours")]
-        [Range(1, int.MaxValue, ErrorMessage ="Set time must be greater than 1")]
+        [Range(1, 999, ErrorMessage ="Required Hours must be between 1 and 999")]
         public int RequiredHours { get; set; }
 
         [Display(Name = "Completed")]

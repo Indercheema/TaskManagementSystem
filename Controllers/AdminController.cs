@@ -91,8 +91,12 @@ namespace TaskManagementSystem.Controllers
             {
                 await _userManager.AddToRoleAsync(foundUser, role.Name);
                 _context.SaveChanges();
+
                 vm.ViewMessage = $"{role.Name} Role Succesfully added to {foundUser.FullName}";
-            } else
+
+                return RedirectToAction("Index");
+            } 
+            else
             {
                 vm.ViewMessage = $"'{foundUser.FullName}' already has '{role.Name}' Role";
             }
