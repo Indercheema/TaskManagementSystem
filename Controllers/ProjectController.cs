@@ -88,18 +88,18 @@ namespace TaskManagementSystem.Controllers
                 {
                     foreach (Task t in p.Tasks)
                     {
-                        bool hasRole = false;
+                        bool hasUnAssignedTask = false;
 
                         foreach (TaskContributor tc in taskContributors)
                         {
 
                             if (t.Id == tc.TaskId)
                             {
-                                hasRole = true;
+                                hasUnAssignedTask = true;
                             }
 
                         }
-                        if (!hasRole)
+                        if (!hasUnAssignedTask)
                         {
                             tasks.Add(t);
                             project2.Add(p);
