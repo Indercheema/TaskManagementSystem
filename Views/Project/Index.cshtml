@@ -106,7 +106,7 @@
     }
 </div>
 
-@if (Model.Tasks.Count > 0)
+@if (Model.Tasks.Count > 0 && Model.Filter.Equals(FilterBy.AssignedTask))
 {
 
     <div class="mt-4">
