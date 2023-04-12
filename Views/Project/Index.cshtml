@@ -117,9 +117,6 @@
                 <hr />
                 <br />
                 <a asp-action="CreateTask" asp-route-projectid="@t.Project.Id">Create Task</a>
-
-@*                @if (Model.Tasks.Count != 0)
-                {*@
                     <table class="table mt-4">
                         <thead>
                             <tr>
@@ -160,9 +157,7 @@
                         </tbody>
                     </table>
                     <br />
-                    <br />
-@*                }
-*@               
+                    <br />             
             </div>
 
         }
