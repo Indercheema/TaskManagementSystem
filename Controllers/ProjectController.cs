@@ -232,6 +232,7 @@ namespace TaskManagementSystem.Controllers
         {
             try
             {
+                ApplicationUser manager = _context.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
 
                 List<string> ProjectDevelopersId = Request.Form["UserId"].ToList();
 
@@ -246,27 +247,32 @@ namespace TaskManagementSystem.Controllers
                         Projectdevelopers.Add(user);
                     }
                 }
-
                 Project newProject = new Project();
+                newProject.Manager = manager;
+                newProject.MangerId = manager.Id;
                 newProject.Title = vm.Title;
 
-                _context.Project.Add(newProject);
-                _context.SaveChanges();
-
-                foreach (ApplicationUser u in Projectdevelopers)
+                if (ModelState.IsValid)
                 {
-                    ProjectContributor newProjectContributor = new ProjectContributor();
+                    _context.Project.Add(newProject);
+                    _context.SaveChanges();
 
-                    newProjectContributor.Project = newProject;
-                    newProjectContributor.ApplicationUser = u;
-                    newProjectContributor.UserId = u.Id;
-                    newProjectContributor.ProjectId = newProject.Id;
+                    foreach (ApplicationUser u in Projectdevelopers)
+                    {
+                        ProjectContributor newProjectContributor = new ProjectContributor();
 
-                    u.ProjectContributors.Add(newProjectContributor);
-                    newProject.ProjectContributors.Add(newProjectContributor);
+                        newProjectContributor.Project = newProject;
+                        newProjectContributor.ApplicationUser = u;
+                        newProjectContributor.UserId = u.Id;
+                        newProjectContributor.ProjectId = newProject.Id;
+
+                        u.ProjectContributors.Add(newProjectContributor);
+                        newProject.ProjectContributors.Add(newProjectContributor);
+                    }
+
+                    _context.SaveChanges();
                 }
 
-                _context.SaveChanges();
 
                 return RedirectToAction("Index");
             }
