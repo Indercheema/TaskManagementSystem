@@ -36,50 +36,72 @@ namespace TaskManagementSystem.Controllers
         [HttpGet]
         public IActionResult Index(int page = 1)
         {
-            FilterByVM vm = new FilterByVM();
+            FilterTaskVM vm = new FilterTaskVM();
+
+            ApplicationUser manager = _context.Users
+                .Where(u => u.UserName == User.Identity.Name)
+                .FirstOrDefault();
+
             HashSet<Project> allProjects = _context.Project
                .Include(p => p.Tasks)
                .OrderBy(p => p.Title)
-            .ToHashSet();
+               .Where(p => p.MangerId == manager.Id)
+               .ToHashSet();
+
             ViewBag.TotalPage = Math.Ceiling(allProjects.Count() / 1.0);
+
             HashSet<Task> AllTasksInProjects = new HashSet<Task>();
+
             foreach (Task t in allProjects.SelectMany(p => p.Tasks))
             {
                 AllTasksInProjects.Add(t);
             }
 
-            //ViewBag.tasks = Math.Ceiling(projects.SelectMany(p => p.Tasks).Count() / 2.0);
-
             ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 3.0);
 
-            //vm.Tasks = projects.FirstOrDefault().Tasks.Skip((page - 1) * 2).Take(2).ToHashSet();
-            //vm.Tasks = projects.SelectMany(p => p.Tasks.Skip((page - 1) * 2).Take(2)).ToHashSet();
             vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).ToHashSet();
+
+            if(allProjects.Count == 0)
+            {
+                ViewBag.Message = "You have no projects";
+            }
+
+            // Display project without tasks only on the first page
             if (page == 1)
             {
                 vm.Projects = allProjects.Where(p => p.Tasks.Count == 0).ToHashSet();
             }
+
             return View(vm);
 
         }
 
 
         [HttpPost]
-        public IActionResult Index(int page, FilterByVM vm)
+        public IActionResult Index(int page, FilterTaskVM vm)
         {
+            ApplicationUser manager = _context.Users
+                .Where(u => u.UserName == User.Identity.Name)
+                .FirstOrDefault();
+
             HashSet<Project> allProjects = _context.Project
               .Include(p => p.Tasks)
               .OrderBy(p => p.Title)
-           .ToHashSet();
+              .Where(p => p.MangerId == manager.Id)
+              .ToHashSet();
+
             ViewBag.TotalPage = Math.Ceiling(allProjects.Count() / 1.0);
+
             HashSet<Task> AllTasksInProjects = new HashSet<Task>();
+
             foreach (Task t in allProjects.SelectMany(p => p.Tasks))
             {
                 AllTasksInProjects.Add(t);
             }
+
             ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 3.0);
 
-            //vm.Tasks = tasks.Skip((page - 1) * 3).Take(3).ToHashSet();
+            
             if (page == 1)
             {
                 vm.Projects = allProjects.Where(p => p.Tasks.Count == 0).ToHashSet();
@@ -87,28 +109,38 @@ namespace TaskManagementSystem.Controllers
 
             if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Ascending))
             {
-                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).OrderBy(t => t.RequiredHours).ToHashSet();
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3)
+                    .OrderBy(t => t.RequiredHours)
+                    .ToHashSet();
             }
-
 
             if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Descending))
             {
-                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).OrderByDescending(t => t.RequiredHours).ToHashSet();
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3)
+                    .OrderByDescending(t => t.RequiredHours)
+                    .ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Ascending))
             {
-                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).OrderBy(t => t.Priority).ToHashSet();
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3)
+                    .OrderBy(t => t.Priority)
+                    .ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Descending))
             {
-                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).OrderByDescending(t => t.Priority).ToHashSet();
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3)
+                    .OrderByDescending(t => t.Priority)
+                    .ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.CompletedTask))
             {
-                vm.Tasks = AllTasksInProjects.Where(t => t.IsCompleted == false).Skip((page - 1) * 3).Take(3).ToHashSet();
+                vm.Tasks = AllTasksInProjects
+                    .Where(t => t.IsCompleted == false)
+                    .Skip((page - 1) * 3).Take(3)
+                    .ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.AssignedTask))
@@ -116,7 +148,9 @@ namespace TaskManagementSystem.Controllers
 
                 HashSet<Task> TasksWithoutDevelopers = new HashSet<Task>();
 
-                HashSet<Project> projects = _context.Project.ToHashSet();
+                HashSet<Project> projects = _context.Project
+                    .Where(p => p.MangerId == manager.Id)
+                    .ToHashSet();
 
                 HashSet<Project> projectWithoutAssignedTask = new HashSet<Project>();
 
@@ -150,7 +184,9 @@ namespace TaskManagementSystem.Controllers
 
 
                 }
-                vm.Tasks = TasksWithoutDevelopers.Skip((page - 1) * 3).Take(3).OrderBy(t => t.Project.Title).ToHashSet();
+                vm.Tasks = TasksWithoutDevelopers.Skip((page - 1) * 3).Take(3)
+                    .OrderBy(t => t.Project.Title)
+                    .ToHashSet();
             }
 
             return View(vm);
@@ -160,8 +196,12 @@ namespace TaskManagementSystem.Controllers
 
         public IActionResult Details(int projectid)
         {
-            FilterByVM vm = new FilterByVM();
-            Project project = _context.Project.Include(p => p.Tasks).FirstOrDefault(p => p.Id == projectid);
+            FilterTaskVM vm = new FilterTaskVM();
+
+            Project project = _context.Project
+                .Include(p => p.Tasks)
+                .FirstOrDefault(p => p.Id == projectid);
+
             vm.ProjectId = projectid;
             vm.Project = project;
             return View(vm);
@@ -169,7 +209,7 @@ namespace TaskManagementSystem.Controllers
 
         [HttpPost]
 
-        public IActionResult Details(FilterByVM vm)
+        public IActionResult Details(FilterTaskVM vm)
         {
 
             if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Ascending))
@@ -212,8 +252,7 @@ namespace TaskManagementSystem.Controllers
 
                 HashSet<TaskContributor> taskContributors = _context.TaskContributor.ToHashSet();
 
-                //foreach (Project p in projects)
-                //{
+                
                 foreach (Task t in vm.Project.Tasks)
                 {
                     bool hasUnAssignedTask = false;
@@ -236,7 +275,7 @@ namespace TaskManagementSystem.Controllers
                 }
 
 
-                //}
+               
                 vm.Tasks = tasks;
             }
 

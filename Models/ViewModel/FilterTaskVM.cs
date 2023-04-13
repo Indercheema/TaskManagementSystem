@@ -3,7 +3,7 @@ using System.Xml.Linq;
 
 namespace TaskManagementSystem.Models.ViewModel
 {
-    public class FilterByVM
+    public class FilterTaskVM
     {
         [Display(Name ="Filter By")]
         public FilterBy Filter { get; set; } = FilterBy.Hours;
