@@ -50,16 +50,16 @@ namespace TaskManagementSystem.Controllers
 
         public IActionResult UpdateRequiredHours(int id, Task task)
         {
-            Task foundTask = _context.Task.Find(id);
+            Task selectedTask = _context.Task.Find(id);
 
-            if (foundTask == null && task != null)
+            if (selectedTask == null && task != null)
             {
                 return BadRequest();
             }
             else if (task != null)
             {
-                foundTask.RequiredHours = task.RequiredHours;
-                _context.Task.Update(foundTask);
+                selectedTask.RequiredHours = task.RequiredHours;
+                _context.Task.Update(selectedTask);
                 _context.SaveChanges();
             }
 
@@ -70,16 +70,16 @@ namespace TaskManagementSystem.Controllers
 
         public IActionResult MarkAsCompleted(int? id, Task task)
         {
-            Task foundTask = _context.Task.Find(id);
+            Task selectedTask = _context.Task.Find(id);
 
-            if (foundTask == null && task != null)
+            if (selectedTask == null && task != null)
             {
                 return BadRequest();
             }
             else if (task != null)
             {
-                foundTask.IsCompleted = true;
-                _context.Task.Update(foundTask);
+                selectedTask.IsCompleted = true;
+                _context.Task.Update(selectedTask);
                 _context.SaveChanges();
             }
 
