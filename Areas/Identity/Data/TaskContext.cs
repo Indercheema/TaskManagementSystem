@@ -37,6 +37,11 @@ public class TaskContext : IdentityDbContext<ApplicationUser>
             .WithOne(t => t.Project)
             .HasForeignKey(t => t.ProjectId);
 
+        modelBuilder.Entity<ApplicationUser>()
+            .HasMany(u => u.Projects)
+            .WithOne(p => p.Manager)
+            .HasForeignKey(p => p.MangerId);
+
         modelBuilder.Entity<Task>()
             .HasMany(t => t.TaskContributors)
             .WithOne(tc => tc.Task)

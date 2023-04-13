@@ -20,5 +20,8 @@ public class ApplicationUser : IdentityUser
 
     public virtual HashSet<TaskContributor> TaskContributors { get; set; } = new HashSet<TaskContributor>();
 
+    public virtual HashSet<Project> Projects { get; set; } = new HashSet<Project>();
+
+
 }
 
