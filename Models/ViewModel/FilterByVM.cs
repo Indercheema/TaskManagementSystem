@@ -17,6 +17,10 @@ namespace TaskManagementSystem.Models.ViewModel
 
         public Task Task { get; set; }
 
+        public int PageCount { get; set; }
+
+        public int PageNumber { get; set; }
+
         public HashSet<Task> Tasks { get; set; } = new HashSet<Task>();
 
         public HashSet<Project> Projects { get; set; } = new HashSet<Project>();
