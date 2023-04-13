@@ -6,12 +6,16 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Versioning;
 using System.Drawing.Drawing2D;
+using PagedList;
+using PagedList.Mvc;
+using System.Drawing.Printing;
 using TaskManagementSystem.Areas.Identity.Data;
 using TaskManagementSystem.Data;
 using TaskManagementSystem.Models;
 using TaskManagementSystem.Models.ViewModel;
 using Project = TaskManagementSystem.Models.Project;
 using Task = TaskManagementSystem.Models.Task;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TaskManagementSystem.Controllers
 {
@@ -30,57 +34,91 @@ namespace TaskManagementSystem.Controllers
 
         }
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
             FilterByVM vm = new FilterByVM();
-            HashSet<Project> projects = _context.Project
+            HashSet<Project> allProjects = _context.Project
                .Include(p => p.Tasks)
                .OrderBy(p => p.Title)
-               .ToHashSet();
+            .ToHashSet();
+            ViewBag.TotalPage = Math.Ceiling(allProjects.Count() / 1.0);
+            HashSet<Task> AllTasksInProjects = new HashSet<Task>();
+            foreach (Task t in allProjects.SelectMany(p => p.Tasks))
+            {
+                AllTasksInProjects.Add(t);
+            }
 
-            vm.Projects = projects;
+            //ViewBag.tasks = Math.Ceiling(projects.SelectMany(p => p.Tasks).Count() / 2.0);
 
+            ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 3.0);
+
+            //vm.Tasks = projects.FirstOrDefault().Tasks.Skip((page - 1) * 2).Take(2).ToHashSet();
+            //vm.Tasks = projects.SelectMany(p => p.Tasks.Skip((page - 1) * 2).Take(2)).ToHashSet();
+            vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).ToHashSet();
+            if (page == 1)
+            {
+                vm.Projects = allProjects.Where(p => p.Tasks.Count == 0).ToHashSet();
+            }
             return View(vm);
 
         }
 
 
         [HttpPost]
-        public IActionResult Index(FilterByVM vm)
+        public IActionResult Index(int page, FilterByVM vm)
         {
+            HashSet<Project> allProjects = _context.Project
+              .Include(p => p.Tasks)
+              .OrderBy(p => p.Title)
+           .ToHashSet();
+            ViewBag.TotalPage = Math.Ceiling(allProjects.Count() / 1.0);
+            HashSet<Task> AllTasksInProjects = new HashSet<Task>();
+            foreach (Task t in allProjects.SelectMany(p => p.Tasks))
+            {
+                AllTasksInProjects.Add(t);
+            }
+            ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 3.0);
+
+            //vm.Tasks = tasks.Skip((page - 1) * 3).Take(3).ToHashSet();
+            if (page == 1)
+            {
+                vm.Projects = allProjects.Where(p => p.Tasks.Count == 0).ToHashSet();
+            }
+
             if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Ascending))
             {
-                vm.Projects = _context.Project.Include(p => p.Tasks.OrderBy(t => t.RequiredHours)).OrderBy(p => p.Title).ToHashSet();
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).OrderBy(t => t.RequiredHours).ToHashSet();
             }
+
 
             if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Descending))
             {
-                vm.Projects = _context.Project.Include(p => p.Tasks.OrderByDescending(t => t.RequiredHours)).OrderBy(p => p.Title).ToHashSet();
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).OrderByDescending(t => t.RequiredHours).ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Ascending))
             {
-                vm.Projects = _context.Project.Include(p => p.Tasks.OrderBy(t => t.Priority)).OrderBy(p => p.Title).ToHashSet();
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).OrderBy(t => t.Priority).ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Descending))
             {
-                vm.Projects = _context.Project.Include(p => p.Tasks.OrderByDescending(t => t.Priority)).OrderBy(p => p.Title).ToHashSet();
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).OrderByDescending(t => t.Priority).ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.CompletedTask))
             {
-                vm.Projects = _context.Project.Include(p => p.Tasks.Where(t => t.IsCompleted == false)).OrderBy(p => p.Title).ToHashSet();
+                vm.Tasks = AllTasksInProjects.Where(t => t.IsCompleted == false).Skip((page - 1) * 3).Take(3).ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.AssignedTask))
             {
 
-                HashSet<Task> tasks = new HashSet<Task>();
+                HashSet<Task> TasksWithoutDevelopers = new HashSet<Task>();
 
                 HashSet<Project> projects = _context.Project.ToHashSet();
 
-                HashSet<Project> project2 = new HashSet<Project>();
+                HashSet<Project> projectWithoutAssignedTask = new HashSet<Project>();
 
                 HashSet<Task> allTasks = _context.Task.ToHashSet();
 
@@ -103,8 +141,8 @@ namespace TaskManagementSystem.Controllers
                         }
                         if (!hasUnAssignedTask)
                         {
-                            tasks.Add(t);
-                            project2.Add(p);
+                            TasksWithoutDevelopers.Add(t);
+                            projectWithoutAssignedTask.Add(p);
 
                         }
 
@@ -112,7 +150,7 @@ namespace TaskManagementSystem.Controllers
 
 
                 }
-                vm.Tasks = tasks.OrderBy(t => t.Project.Title).ToHashSet();
+                vm.Tasks = TasksWithoutDevelopers.Skip((page - 1) * 3).Take(3).OrderBy(t => t.Project.Title).ToHashSet();
             }
 
             return View(vm);
@@ -176,26 +214,26 @@ namespace TaskManagementSystem.Controllers
 
                 //foreach (Project p in projects)
                 //{
-                    foreach (Task t in vm.Project.Tasks)
+                foreach (Task t in vm.Project.Tasks)
+                {
+                    bool hasUnAssignedTask = false;
+
+                    foreach (TaskContributor tc in taskContributors)
                     {
-                        bool hasUnAssignedTask = false;
 
-                        foreach (TaskContributor tc in taskContributors)
+                        if (t.Id == tc.TaskId)
                         {
-
-                            if (t.Id == tc.TaskId)
-                            {
-                                hasUnAssignedTask = true;
-                            }
-
-                        }
-                        if (!hasUnAssignedTask)
-                        {
-                            tasks.Add(t);
-
+                            hasUnAssignedTask = true;
                         }
 
                     }
+                    if (!hasUnAssignedTask)
+                    {
+                        tasks.Add(t);
+
+                    }
+
+                }
 
 
                 //}
