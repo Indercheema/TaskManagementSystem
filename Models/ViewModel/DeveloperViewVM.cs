@@ -3,6 +3,7 @@
     public class DeveloperViewVM
     {
         public HashSet<Task> Tasks { get; set; }
+
         public HashSet<ProjectContributor> ProjectContributors { get; set; }
     }
 }

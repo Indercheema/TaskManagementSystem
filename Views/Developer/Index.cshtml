@@ -5,7 +5,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Workspace Board</h1>
+<h1>My Workspace Board</h1>
+
+
+@if (!Model.Tasks.Select(pc => pc.Project).Distinct().Any())
+{
+   <p style="color:red;font-size:16px; margin-top:15px;">You have no assigned projects</p>
+}
+
 
 <div class="mt-4">
 
@@ -14,14 +21,10 @@
 
         <div class="bg-light shadow-sm px-4 py-3 rounded-3" style="margin-top:20px">
 
-            @if (p.Tasks.Count != 0)
-            {
-                <h3 class="mt-4">@p.Title</h3>
-            }
-
+            <h3 class="mt-4">@p.Title</h3>
+                        
             <hr />
             <br />
-
 
             @if (p.Tasks.Count != 0)
             {
@@ -79,15 +82,16 @@
     }
 </div>
 
+
 <div class="pagination" style="margin-left: 400px">
     @{
         double TotalPage = ViewBag.tasks;
 
         for (int i = 1; i <= TotalPage; i++)
         {
-
-            <a asp-action="Index" asp-route-page="@i">@i</a>
-
+            <a asp-action="Index" asp-route-page="@i" 
+            style="background-color:#000058;color:#fff;width:50px;height:44px;border:none;border-radius:5px;padding:5px;margin-top:20px;margin-right:10px;text-decoration:none;text-align:center;font-size:16px;"
+            >@i</a>
         }
     }
 </div>

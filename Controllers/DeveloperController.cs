@@ -40,6 +40,7 @@ namespace TaskManagementSystem.Controllers
                 .ToHashSet();
 
             HashSet<Task> AllTasksInProjects = new HashSet<Task>();
+
             foreach (Task t in projects.SelectMany(p => p.Project.Tasks))
             {
                 AllTasksInProjects.Add(t);
@@ -49,7 +50,6 @@ namespace TaskManagementSystem.Controllers
 
             vm.ProjectContributors = projects;
             vm.Tasks = AllTasksInProjects.Skip((page - 1) * 2).Take(2).ToHashSet();
-
 
 
             return View(vm);

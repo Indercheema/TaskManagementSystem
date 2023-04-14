@@ -280,20 +280,7 @@ namespace TaskManagementSystem.Controllers
         {
             IdentityRole role = _roleManager.Roles.Where(r => r.Name == "Developer").FirstOrDefault();
 
-
-            HashSet<string> DevelopersInRoleId = _context.UserRoles.Where(ur => ur.RoleId == role.Id)
-                .Select(ur => ur.UserId)
-                .ToHashSet();
-
-            HashSet<ApplicationUser> DevelopersInRole = new HashSet<ApplicationUser>();
-
-            foreach (string user in DevelopersInRoleId)
-            {
-                ApplicationUser developer = _context.Users.Find(user);
-                DevelopersInRole.Add(developer);
-            }
-
-            CreateProjectVm vm = new CreateProjectVm(DevelopersInRole);
+            CreateProjectVm vm = new CreateProjectVm(GetAllDevelopers(role));
 
             return View(vm);
         }
@@ -303,7 +290,13 @@ namespace TaskManagementSystem.Controllers
         {
             try
             {
+                /* Research on how to display a multiselect drop down list was gotten from  
+                 * https://stackoverflow.com/questions/48522194/bootstrap-multiselect-drop-down-list-is-not-showing
+                */
+
                 ApplicationUser manager = _context.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+
+                IdentityRole role = _roleManager.Roles.Where(r => r.Name == "Developer").FirstOrDefault();
 
                 List<string> ProjectDevelopersId = Request.Form["UserId"].ToList();
 
@@ -342,6 +335,10 @@ namespace TaskManagementSystem.Controllers
                     }
 
                     _context.SaveChanges();
+                } else
+                {
+                    CreateProjectVm newVm = new CreateProjectVm(GetAllDevelopers(role));
+                    return View(newVm);
                 }
 
 
@@ -351,6 +348,23 @@ namespace TaskManagementSystem.Controllers
             {
                 return NotFound();
             }
+        }
+
+        public HashSet<ApplicationUser> GetAllDevelopers(IdentityRole role)
+        {
+            HashSet<string> DevelopersInRoleId = _context.UserRoles.Where(ur => ur.RoleId == role.Id)
+                .Select(ur => ur.UserId)
+                .ToHashSet();
+
+            HashSet<ApplicationUser> DevelopersInRole = new HashSet<ApplicationUser>();
+
+            foreach (string user in DevelopersInRoleId)
+            {
+                ApplicationUser developer = _context.Users.Find(user);
+                DevelopersInRole.Add(developer);
+            }
+
+            return DevelopersInRole;
         }
 
 
