@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TaskManagementSystem.Models.ProjectContributor>
+﻿@model TaskManagementSystem.Models.ViewModel.DeveloperViewVM
 
 @{
     ViewData["Title"] = "Index";
@@ -8,15 +8,22 @@
 <h1>Workspace Board</h1>
 
 <div class="mt-4">
-    
-    @foreach (ProjectContributor pc in Model)
+
+    @foreach (Project p in Model.Tasks.Select(pc => pc.Project).Distinct())
     {
+
         <div class="bg-light shadow-sm px-4 py-3 rounded-3" style="margin-top:20px">
-            <h3 class="mt-4">@pc.Project.Title</h3>
+
+            @if (p.Tasks.Count != 0)
+            {
+                <h3 class="mt-4">@p.Title</h3>
+            }
+
             <hr />
             <br />
 
-            @if (pc.Project.Tasks.Count != 0)
+
+            @if (p.Tasks.Count != 0)
             {
                 <table class="table mt-2">
                     <thead>
@@ -38,7 +45,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var t in pc.Project.Tasks)
+                        @foreach (var t in Model.Tasks.Where(t => t.ProjectId == p.Id))
                         {
                             <tr>
                                 <td>
@@ -54,8 +61,8 @@
                                     @Html.DisplayFor(modelItem => t.IsCompleted)
                                 </td>
                                 <td>
-                                    <a style="background-color:#f0f2f3;color: #000058; width: 450px; height:12%; border:none;border:solid;border-width:thin;border-color:#000058; border-radius:5px; padding:5px; text-decoration:none;font-weight:400" asp-action="UpdateRequiredHours" asp-route-id="@t.Id">Adjust Hours</a> 
-                                    <a style="background-color:#000058;color: #fff; width: 450px; height:14%; border:none;border-radius:5px;padding:5px;text-decoration:none;font-weight:400;" asp-action="MarkAsCompleted"  asp-route-id="@t.Id">Mark Completed</a> 
+                                    <a style="background-color:#f0f2f3;color: #000058; width: 450px; height:12%; border:none;border:solid;border-width:thin;border-color:#000058; border-radius:5px; padding:5px; text-decoration:none;font-weight:400" asp-action="UpdateRequiredHours" asp-route-id="@t.Id">Adjust Hours</a>
+                                    <a style="background-color:#000058;color: #fff; width: 450px; height:14%; border:none;border-radius:5px;padding:5px;text-decoration:none;font-weight:400;" asp-action="MarkAsCompleted" asp-route-id="@t.Id">Mark Completed</a>
                                 </td>
                             </tr>
                         }
@@ -66,9 +73,21 @@
             }
             else
             {
-               <p style="color:red;font-size:16px; margin-top:15px;">No Tasks Assigned</p>
+                <p style="color:red;font-size:16px; margin-top:15px;">No Tasks Assigned</p>
             }
         </div>
     }
 </div>
 
+<div class="pagination" style="margin-left: 400px">
+    @{
+        double TotalPage = ViewBag.tasks;
+
+        for (int i = 1; i <= TotalPage; i++)
+        {
+
+            <a asp-action="Index" asp-route-page="@i">@i</a>
+
+        }
+    }
+</div>
