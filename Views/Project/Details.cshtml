@@ -13,26 +13,39 @@
 <h5>Sort Task</h5>
 <div>
     <form asp-action="Details" method="post">
-        <div class="flex flex-row h-75 justify-content-between mt-3" style="display:flex; width:400px;">
-            <div class="w-[38] h-25">
-                <label asp-for="Filter" class="control-label"></label>
-                <br />
-                <select asp-for="Filter" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.FilterBy>()" style="border-radius: 5px; width:120px; height: 43px; padding: 5px;margin-top:4px"></select>
+        <div class="flex flex-row justify-content-between" style="display:flex;width:100%;">
+
+            <div class="flex flex-row h-75 justify-content-between mt-3" style="display:flex; width:40%;">
+                <div class="w-[38] h-25">
+                    <label asp-for="Filter" class="control-label"></label>
+                    <br />
+                    <select asp-for="Filter" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.FilterBy>()" style="border-radius: 5px; width:180px; height: 43px; padding: 5px;margin-top:4px"></select>
+                </div>
+
+                <div class="w-[38] h-25">
+                    <label asp-for="Order" class="control-label"></label>
+                    <br />
+                    <select asp-for="Order" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.OrderBy>()" style="border-radius: 5px; width:150px; height: 43px; padding: 5px;margin-top:4px"></select>
+                </div>
+
+                <div>
+                    <input asp-route-projectid="@Model.Project.Id" type="submit" value="Apply" style="background-color:#000058;color: #fff;width:100px;height:44px;border:none;border-radius:5px; padding:5px;margin-top:26px;" />
+                </div>
             </div>
 
-            <div>
-                <input asp-for="ProjectId" value="@Model.ProjectId" type="hidden" />
+            <div class="pagination" style="width:30%; height:10%;margin-top:16px;">
+                <label style="text-align:center">Pages</label>
+                @{
+                    double TotalPage = ViewBag.tasks;
+
+                    for (int i = 1; i <= TotalPage; i++)
+                    {
+
+                        <input asp-route-page="@i" asp-route-projectid="@Model.Project.Id" type="submit" value="@i" style="background-color:#000058;color:#fff;width:50px;height:44px;border:none;border-radius:5px;padding:5px;margin-top:26px;margin-right:10px;" />
+                    }
+                }
             </div>
 
-            <div class="w-[38] h-25">
-                <label asp-for="Order" class="control-label"></label>
-                <br />
-                <select asp-for="Order" asp-items="Html.GetEnumSelectList<TaskManagementSystem.Models.ViewModel.OrderBy>()" style="border-radius: 5px; width:120px; height: 43px; padding: 5px;margin-top:4px"></select>
-            </div>
-
-            <div>
-                <input type="submit" value="Apply" style="background-color:#000058;color: #fff;width:100px;height:44px;border:none;border-radius:5px; padding:5px;margin-top:26px;" />
-            </div>
         </div>
 
 
@@ -40,77 +53,8 @@
 </div>
 <br />
 
-@if (!Model.Filter.Equals(FilterBy.AssignedTask))
-{
 
-    <div class="mt-4">
-        @* @foreach (Project p in Model.Project)
-    {*@
-        <div class="bg-light shadow-sm px-4 py-3 rounded-3 mt-5 code-button">
-            <h3 class="mt-4">@Model.Project.Title</h3>
-            <hr />
-            <br />
-            <a asp-action="CreateTask" asp-route-projectid="@Model.Project.Id">Create Task</a>
-
-            @if (Model.Project.Tasks.Count != 0)
-            {
-                <table class="table mt-4">
-                    <thead>
-                        <tr>
-                            <th>
-                                Title
-                            </th>
-                            <th>
-                                Priority Level
-                            </th>
-                            <th>
-                                Required Hours
-                            </th>
-                            <th>
-                                Completed
-                            </th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var task in Model.Project.Tasks)
-                        {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => task.Title)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => task.Priority)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => task.RequiredHours)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => task.IsCompleted)
-                                </td>
-                                <td>
-                                    <a asp-action="AssignTask" asp-route-taskId="@task.Id">Assign Task</a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                <br />
-                <br />
-            }
-            else
-            {
-                <p style="color:red;font-size:16px; margin-top:15px;">No Assigned Tasks</p>
-            }
-        </div>
-
-        @*}*@
-    </div>
-}
-
-
-@if (Model.Tasks.Count > 0 && Model.Filter.Equals(FilterBy.AssignedTask))
+@if (Model.Tasks.Count > 0)
 {
     <div class="mt-4">
 
@@ -163,13 +107,13 @@
             </table>
             <br />
             <br />
-            }
+
         </div>
 
 
     </div>
 }
-else if (Model.Tasks.Count == 0 && Model.Filter.Equals(FilterBy.AssignedTask))
+else if (Model.Tasks.Count == 0)
 {
-    <p style="color:red;font-size:16px; margin-top:15px;">No UnAssigned Task</p>
+    <p style="color:red;font-size:16px; margin-top:15px;">No Task in this Project</p>
 }

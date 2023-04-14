@@ -7,6 +7,7 @@ using System.Security.Principal;
 using TaskManagementSystem.Areas.Identity.Data;
 using TaskManagementSystem.Data;
 using TaskManagementSystem.Models;
+using TaskManagementSystem.Models.ViewModel;
 using Task = TaskManagementSystem.Models.Task;
 
 namespace TaskManagementSystem.Controllers
@@ -25,9 +26,11 @@ namespace TaskManagementSystem.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
             ApplicationUser user = _context.Users.FirstOrDefault(u => u.UserName == User.Identity.Name);
+
+            DeveloperViewVM vm = new DeveloperViewVM();
 
             HashSet<ProjectContributor> projects = _context.ProjectContributor
                 .Include(pc => pc.Project)
@@ -36,7 +39,20 @@ namespace TaskManagementSystem.Controllers
                 .Where(pc => pc.UserId == user.Id)
                 .ToHashSet();
 
-            return View(projects);
+            HashSet<Task> AllTasksInProjects = new HashSet<Task>();
+            foreach (Task t in projects.SelectMany(p => p.Project.Tasks))
+            {
+                AllTasksInProjects.Add(t);
+            }
+
+            ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 2.0);
+
+            vm.ProjectContributors = projects;
+            vm.Tasks = AllTasksInProjects.Skip((page - 1) * 2).Take(2).ToHashSet();
+
+
+
+            return View(vm);
         }
 
         [HttpGet]
