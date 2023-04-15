@@ -32,7 +32,7 @@ namespace TaskManagementSystem.Controllers
 
             DeveloperViewVM vm = new DeveloperViewVM();
 
-            HashSet<ProjectContributor> projects = _context.ProjectContributor
+            HashSet<ProjectContributor> userProjects = _context.ProjectContributor
                 .Include(pc => pc.Project)
                 .ThenInclude(p => p.Tasks.Where(t => t.TaskContributors.Any(tc => tc.UserId == user.Id)))
                 .ThenInclude(t => t.TaskContributors)
@@ -41,7 +41,7 @@ namespace TaskManagementSystem.Controllers
 
             HashSet<Task> AllTasksInProjects = new HashSet<Task>();
 
-            foreach (Task t in projects.SelectMany(p => p.Project.Tasks))
+            foreach (Task t in userProjects.SelectMany(p => p.Project.Tasks))
             {
                 AllTasksInProjects.Add(t);
             }
@@ -50,7 +50,7 @@ namespace TaskManagementSystem.Controllers
 
             if(page == 1)
             {
-                vm.ProjectContributors = projects;
+                vm.ProjectContributors = userProjects;
             }
 
             vm.Tasks = AllTasksInProjects.Skip((page - 1) * 2).Take(2).ToHashSet();
