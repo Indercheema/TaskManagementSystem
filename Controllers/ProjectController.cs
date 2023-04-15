@@ -48,8 +48,6 @@ namespace TaskManagementSystem.Controllers
                .Where(p => p.MangerId == manager.Id)
                .ToHashSet();
 
-            ViewBag.TotalPage = Math.Ceiling(allProjects.Count() / 1.0);
-
             HashSet<Task> AllTasksInProjects = new HashSet<Task>();
 
             foreach (Task t in allProjects.SelectMany(p => p.Tasks))
@@ -57,9 +55,13 @@ namespace TaskManagementSystem.Controllers
                 AllTasksInProjects.Add(t);
             }
 
-            ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 3.0);
+            /* Research on how to implement pagination 
+                 * https://stackoverflow.com/questions/446196/how-do-i-do-pagination-in-asp-net-mvc
+                */
 
-            vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3).ToHashSet();
+            ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 10.0);
+
+            vm.Tasks = AllTasksInProjects.Skip((page - 1) * 10).Take(10).ToHashSet();
 
             if(allProjects.Count == 0)
             {
@@ -90,8 +92,6 @@ namespace TaskManagementSystem.Controllers
               .Where(p => p.MangerId == manager.Id)
               .ToHashSet();
 
-            ViewBag.TotalPage = Math.Ceiling(allProjects.Count() / 1.0);
-
             HashSet<Task> AllTasksInProjects = new HashSet<Task>();
 
             foreach (Task t in allProjects.SelectMany(p => p.Tasks))
@@ -99,9 +99,8 @@ namespace TaskManagementSystem.Controllers
                 AllTasksInProjects.Add(t);
             }
 
-            ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 3.0);
+            ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 10.0);
 
-            
             if (page == 1)
             {
                 vm.Projects = allProjects.Where(p => p.Tasks.Count == 0).ToHashSet();
@@ -109,28 +108,28 @@ namespace TaskManagementSystem.Controllers
 
             if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Ascending))
             {
-                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3)
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 10).Take(10)
                     .OrderBy(t => t.RequiredHours)
                     .ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Descending))
             {
-                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3)
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 10).Take(10)
                     .OrderByDescending(t => t.RequiredHours)
                     .ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Ascending))
             {
-                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3)
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 10).Take(10)
                     .OrderBy(t => t.Priority)
                     .ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Descending))
             {
-                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 3).Take(3)
+                vm.Tasks = AllTasksInProjects.Skip((page - 1) * 10).Take(10)
                     .OrderByDescending(t => t.Priority)
                     .ToHashSet();
             }
@@ -139,7 +138,7 @@ namespace TaskManagementSystem.Controllers
             {
                 vm.Tasks = AllTasksInProjects
                     .Where(t => t.IsCompleted == false)
-                    .Skip((page - 1) * 3).Take(3)
+                    .Skip((page - 1) * 10).Take(10)
                     .ToHashSet();
             }
 
@@ -184,7 +183,7 @@ namespace TaskManagementSystem.Controllers
 
 
                 }
-                vm.Tasks = TasksWithoutDevelopers.Skip((page - 1) * 3).Take(3)
+                vm.Tasks = TasksWithoutDevelopers.Skip((page - 1) * 10).Take(10)
                     .OrderBy(t => t.Project.Title)
                     .ToHashSet();
             }
@@ -198,10 +197,10 @@ namespace TaskManagementSystem.Controllers
         {
             FilterTaskVM vm = new FilterTaskVM();
             Project project = _context.Project.Include(p => p.Tasks).FirstOrDefault(p => p.Id == projectid);
-            ViewBag.tasks = Math.Ceiling(project.Tasks.Count() / 2.0);
+            ViewBag.tasks = Math.Ceiling(project.Tasks.Count() / 10.0);
             vm.ProjectId = projectid;
             vm.Project = project;
-            vm.Tasks = project.Tasks.Skip((page - 1) * 2).Take(2).ToHashSet();
+            vm.Tasks = project.Tasks.Skip((page - 1) * 10).Take(10).ToHashSet();
 
             return View(vm);
         }
@@ -211,32 +210,32 @@ namespace TaskManagementSystem.Controllers
         public IActionResult Details(int page, FilterTaskVM vm)
         {
             Project project = _context.Project.Include(p => p.Tasks).FirstOrDefault(p => p.Id == vm.ProjectId);
-            ViewBag.tasks = Math.Ceiling(project.Tasks.Count() / 2.0);
+            ViewBag.tasks = Math.Ceiling(project.Tasks.Count() / 10.0);
             vm.Project = project;
 
             if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Ascending))
             {
-                vm.Tasks = project.Tasks.Skip((page - 1) * 2).Take(2).OrderBy(t => t.RequiredHours).ToHashSet();
+                vm.Tasks = project.Tasks.Skip((page - 1) * 10).Take(10).OrderBy(t => t.RequiredHours).ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Hours) && vm.Order.Equals(OrderBy.Descending))
             {
-                vm.Tasks = project.Tasks.Skip((page - 1) * 2).Take(2).OrderByDescending(t => t.RequiredHours).ToHashSet();
+                vm.Tasks = project.Tasks.Skip((page - 1) * 10).Take(10).OrderByDescending(t => t.RequiredHours).ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Ascending))
             {
-                vm.Tasks = project.Tasks.Skip((page - 1) * 2).Take(2).OrderBy(t => t.Priority).ToHashSet();
+                vm.Tasks = project.Tasks.Skip((page - 1) * 10).Take(10).OrderBy(t => t.Priority).ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.Priority) && vm.Order.Equals(OrderBy.Descending))
             {
-                vm.Tasks = project.Tasks.Skip((page - 1) * 2).Take(2).OrderByDescending(t => t.Priority).ToHashSet();
+                vm.Tasks = project.Tasks.Skip((page - 1) * 10).Take(10).OrderByDescending(t => t.Priority).ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.CompletedTask))
             {
-                vm.Tasks = project.Tasks.Where(t => t.IsCompleted == false).Skip((page - 1) * 3).Take(3).ToHashSet();
+                vm.Tasks = project.Tasks.Where(t => t.IsCompleted == false).Skip((page - 1) * 10).Take(10).ToHashSet();
             }
 
             if (vm.Filter.Equals(FilterBy.AssignedTask))
@@ -270,7 +269,7 @@ namespace TaskManagementSystem.Controllers
 
                 }
 
-                vm.Tasks = TasksWithoutDevelopers.Skip((page - 1) * 3).Take(3).OrderBy(t => t.Project.Title).ToHashSet();
+                vm.Tasks = TasksWithoutDevelopers.Skip((page - 1) * 10).Take(10).OrderBy(t => t.Project.Title).ToHashSet();
             }
 
             return View(vm);

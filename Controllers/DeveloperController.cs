@@ -46,14 +46,22 @@ namespace TaskManagementSystem.Controllers
                 AllTasksInProjects.Add(t);
             }
 
-            ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 2.0);
+            ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 10.0);
 
-            if(page == 1)
+            vm.ProjectContributors = userProjects.Where(pc => pc.Project.Tasks.Count == 0).ToHashSet();
+
+
+            if (page > 1)
             {
-                vm.ProjectContributors = userProjects;
+                vm.ProjectContributors = null;
             }
 
-            vm.Tasks = AllTasksInProjects.Skip((page - 1) * 2).Take(2).ToHashSet();
+            if (userProjects.Count == 0)
+            {
+                ViewBag.Message = "You have no Assigned Projects";
+            }
+
+            vm.Tasks = AllTasksInProjects.Skip((page - 1) * 10).Take(10).ToHashSet();
 
 
             return View(vm);

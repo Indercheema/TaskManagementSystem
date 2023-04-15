@@ -9,30 +9,22 @@
 
 <h1>My Workspace Board</h1>
 
-
-@if (!Model.ProjectContributors.Select(pc => pc.Project).Distinct().Any())
-{
-    <p style="color:red;font-size:16px; margin-top:15px;">You have no assigned projects</p>
-}
-
-@if (Model.Tasks.Count > 0 || Model.Tasks.Count == 0)
+@if (Model.Tasks.Count > 0)
 {
     @if (Model.ProjectContributors != null)
     {
         @foreach (Project project in Model.ProjectContributors.Select(pc => pc.Project))
         {
-            @if (project.Tasks.Count == 0)
-            {
-                <div class="bg-light shadow-sm px-4 py-3 rounded-3 mt-5 code-button">
 
-                    <h3 class="mt-4">@project.Title</h3>
-                    <hr />
-                    <br />
-                    <p style="color:red;font-size:16px; margin-top:15px;">No Tasks Available</p>
+            <div class="bg-light shadow-sm px-4 py-3 rounded-3 mt-5 code-button">
+
+                <h3 class="mt-4">@project.Title</h3>
+                <hr />
+                <br />
+                <p style="color:red;font-size:16px; margin-top:15px;">No Tasks Available</p>
 
 
-                </div>
-            }
+            </div>
 
         }
 
@@ -107,7 +99,7 @@
 }
 else if (Model.Tasks.Count == 0)
 {
-    <p style="color:red;font-size:16px; margin-top:15px;">No UnAssigned Task</p>
+    <p style="color:red;font-size:16px; margin-top:15px;">@ViewBag.Message</p>
 }
 
 <div class="pagination" style="margin-left: 400px">

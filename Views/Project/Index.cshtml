@@ -39,9 +39,13 @@
             </div>
 
             <div class="pagination" style="width:30%; height:10%;margin-top:16px;">
-                <label style="text-align:center">Pages</label>
                 @{
                     double TotalPage = ViewBag.tasks;
+                    if (TotalPage > 0)
+                    {
+                       <label style="text-align:center">Pages</label>
+
+                    }
 
                     for (int i = 1; i <= TotalPage; i++)
                     {
