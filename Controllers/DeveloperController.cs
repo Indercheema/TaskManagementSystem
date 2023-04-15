@@ -53,7 +53,6 @@ namespace TaskManagementSystem.Controllers
                 vm.ProjectContributors = projects;
             }
 
-
             vm.Tasks = AllTasksInProjects.Skip((page - 1) * 2).Take(2).ToHashSet();
 
 
