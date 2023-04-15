@@ -1,0 +1,123 @@
+﻿@model TaskManagementSystem.Models.ViewModel.DeveloperViewVM
+@using Task = TaskManagementSystem.Models.Task;
+
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>My Workspace Board</h1>
+
+
+@if (!Model.ProjectContributors.Select(pc => pc.Project).Distinct().Any())
+{
+    <p style="color:red;font-size:16px; margin-top:15px;">You have no assigned projects</p>
+}
+
+@if (Model.Tasks.Count > 0 || Model.Tasks.Count == 0)
+{
+    @if (Model.ProjectContributors != null)
+    {
+        @foreach (Project project in Model.ProjectContributors.Select(pc => pc.Project))
+        {
+            @if (project.Tasks.Count == 0)
+            {
+                <div class="bg-light shadow-sm px-4 py-3 rounded-3 mt-5 code-button">
+
+                    <h3 class="mt-4">@project.Title</h3>
+                    <hr />
+                    <br />
+                    <p style="color:red;font-size:16px; margin-top:15px;">No Tasks Available</p>
+
+
+                </div>
+            }
+
+        }
+
+    }
+    <div class="mt-4">
+
+        @foreach (Project p in Model.Tasks.Select(pc => pc.Project).Distinct())
+        {
+
+            <div class="bg-light shadow-sm px-4 py-3 rounded-3" style="margin-top:20px">
+
+                <h3 class="mt-4">@p.Title</h3>
+
+                <hr />
+                <br />
+
+                @if (p.Tasks.Count != 0)
+                {
+                    <table class="table mt-2">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Title
+                                </th>
+                                <th>
+                                    Priority Level
+                                </th>
+                                <th>
+                                    Required Hours
+                                </th>
+                                <th>
+                                    Completed
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (Task t in Model.Tasks.Where(t => t.ProjectId == p.Id))
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.Title)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.Priority)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.RequiredHours)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => t.IsCompleted)
+                                    </td>
+                                    <td>
+                                        <a style="background-color:#f0f2f3;color: #000058; width: 450px; height:12%; border:none;border:solid;border-width:thin;border-color:#000058; border-radius:5px; padding:5px; text-decoration:none;font-weight:400" asp-action="UpdateRequiredHours" asp-route-id="@t.Id">Adjust Hours</a>
+                                        <a style="background-color:#000058;color: #fff; width: 450px; height:14%; border:none;border-radius:5px;padding:5px;text-decoration:none;font-weight:400;" asp-action="MarkAsCompleted" asp-route-id="@t.Id">Mark Completed</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <br />
+                    <br />
+                }
+                else
+                {
+                    <p style="color:red;font-size:16px; margin-top:15px;">No Tasks Assigned</p>
+                }
+            </div>
+        }
+    </div>
+}
+else if (Model.Tasks.Count == 0)
+{
+    <p style="color:red;font-size:16px; margin-top:15px;">No UnAssigned Task</p>
+}
+
+<div class="pagination" style="margin-left: 400px">
+    @{
+        double TotalPage = ViewBag.tasks;
+
+        for (int i = 1; i <= TotalPage; i++)
+        {
+            <a asp-action="Index" asp-route-page="@i"
+       style="background-color:#000058;color:#fff;width:50px;height:44px;border:none;border-radius:5px;padding:5px;margin-top:20px;margin-right:10px;text-decoration:none;text-align:center;font-size:16px;">@i</a>
+        }
+    }
+</div>

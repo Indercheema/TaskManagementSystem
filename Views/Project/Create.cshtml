@@ -1,0 +1,51 @@
+﻿@model TaskManagementSystem.Models.ViewModel.CreateProjectVm
+<h1>Create Project</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="Post">
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mt-4">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control mt-3" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <label asp-for="UserId" class="control-label"></label>
+                <br />
+                @Html.ListBoxFor(model => model.UserId, new MultiSelectList(Model.Developers, "Value", "Text", @Model.UserId)
+                ,new {@class= "form-control developerslist mt-3",multiple="multiple", id="DevelopersList_Dropdown"})
+            </div>
+
+            <div class="form-group mt-4">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts{ 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+
+         <script type="text/javascript"> 
+            $(document).ready(function () {  
+                $('.developerslist').multiselect();  
+            });  
+        </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}  
+

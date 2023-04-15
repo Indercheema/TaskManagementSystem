@@ -1,0 +1,42 @@
+﻿@using TaskManagementSystem.Areas.Identity.Data
+@model ICollection<ApplicationUser>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Non-Assigned Users</h1>
+<hr />
+
+@if(Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                   Full Name
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FullName)
+                    </td>
+                    <td>
+                       <a style="background-color:darkblue;color: #fff; width: 280px; height:12%; border:none; border-radius:5px; padding:5px; text-decoration:none;" asp-action="AssignRole" asp-route-id="@item.Id">Assign Role</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+} 
+else 
+{
+    <div style="margin-top: 20px">
+        <h5 style="color:red;font-size:16px">@ViewBag.Message</h5>
+    </div>
+}

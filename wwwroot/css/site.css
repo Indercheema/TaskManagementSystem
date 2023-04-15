@@ -8,6 +8,17 @@ html {
   }
 }
 
+.code-button a{
+    width: 200px;
+    height: 46px;
+    background-color: #000058;
+    border: none;
+    border-radius: 5px;
+    padding: 4px 7px;
+    text-decoration: none;
+    color: #fff;
+}
+
 html {
   position: relative;
   min-height: 100%;

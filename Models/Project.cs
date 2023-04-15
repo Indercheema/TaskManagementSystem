@@ -13,9 +13,13 @@ namespace TaskManagementSystem.Models
         [Display(Name = "Project Title")]
         public string Title { get; set; }
 
-       
+   
 
         public virtual HashSet<ProjectContributor> ProjectContributors { get; set; } = new HashSet<ProjectContributor>();
+
+        public ApplicationUser? Manager { get; set; }
+
+        public string MangerId { get; set; }
         
         public virtual HashSet<Task> Tasks { get; set; } 
 
