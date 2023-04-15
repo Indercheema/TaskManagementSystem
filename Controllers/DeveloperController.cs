@@ -48,7 +48,12 @@ namespace TaskManagementSystem.Controllers
 
             ViewBag.tasks = Math.Ceiling(AllTasksInProjects.Count() / 2.0);
 
-            vm.ProjectContributors = projects;
+            if(page == 1)
+            {
+                vm.ProjectContributors = projects;
+            }
+
+
             vm.Tasks = AllTasksInProjects.Skip((page - 1) * 2).Take(2).ToHashSet();
 
 
@@ -82,7 +87,7 @@ namespace TaskManagementSystem.Controllers
             return RedirectToAction("Index");
 
         }
-        
+
 
         public IActionResult MarkAsCompleted(int? id, Task task)
         {
